@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+/* 
+  VARIABLES CSS GLOBALES 
+  Aquí definimos los colores exactos de nuestra marca según el diseño (mockup).
+*/
+:root {
+  --color-primary: #ec702e; /* Naranja principal (Botones y destacados) */
+  --color-secondary: #163654; /* Azul marino oscuro (Textos y fondos oscuros) */
+  --color-light: #fefaf3; /* Color crema suave (Fondo de la aplicación) */
+  --color-accent: #f7a977; /* Naranja suave (Detalles) */
+
+  --background: var(--color-light);
+  --foreground: var(--color-secondary);
+}
+
+/* 
+  INTEGRACIÓN CON TAILWIND CSS v4
+  Le decimos a Tailwind que use nuestras variables personalizadas.
+  Esto nos permite usar clases como 'bg-primary' o 'text-secondary'.
+*/
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-light: var(--color-light);
+  --color-accent: var(--color-accent);
+  /* Configuramos Poppins como la fuente sans por defecto */
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}

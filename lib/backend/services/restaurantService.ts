@@ -81,4 +81,28 @@ export class RestaurantService {
     if (error) throw error;
     return data || [];
   }
+
+  // Lógica para actualizar un restaurante existente (Backend)
+  static async updateRestaurant(id: string, restaurantData: any, ownerId: string) {
+    const payload = {
+      name: restaurantData.name,
+      description: restaurantData.description,
+      location: restaurantData.location,
+      image_url: restaurantData.imageUrl,
+      food_type: restaurantData.foodType,
+      services: restaurantData.services || [],
+    };
+
+    // Actualizamos solo si el owner_id coincide, como medida de seguridad
+    const { data, error } = await supabase
+      .from('restaurantes')
+      .update(payload)
+      .eq('id', id)
+      .eq('owner_id', ownerId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
 }

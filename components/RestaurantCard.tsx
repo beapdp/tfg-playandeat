@@ -21,14 +21,18 @@ interface Props {
 export default function RestaurantCard({ restaurant }: Props) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const [showLoginNotice, setShowLoginNotice] = useState(false);
+  // Estado para saber si el que está viendo la tarjeta es un negocio
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   // Comprobamos si el restaurante ya es favorito cuando se carga la tarjeta
   useEffect(() => {
     const checkFavorite = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Guardamos el rol para saber si tenemos que ocultar el botón
+      setUserRole(user.user_metadata?.rol || null);
 
       const { data } = await supabase
         .from('favoritos')
@@ -135,18 +139,20 @@ export default function RestaurantCard({ restaurant }: Props) {
             </div>
           )}
 
-          {/* BOTÓN DE CORAZÓN */}
-          <button 
-            onClick={toggleFavorite}
-            disabled={isLoading}
-            className={`absolute top-3 right-3 p-2 rounded-full shadow-md transition-all duration-300 z-10 ${
-              isFavorite 
-                ? "bg-red-50 text-red-500 scale-110" 
-                : "bg-white/80 text-gray-400 hover:text-red-400 hover:bg-white"
-            } ${showLoginNotice ? "animate-pulse ring-2 ring-red-400" : ""}`}
-          >
-            <Heart size={20} className={isFavorite ? "fill-current" : ""} />
-          </button>
+          {/* BOTÓN DE CORAZÓN (Oculto para Negocios porque no tienen panel de favoritos) */}
+          {userRole !== 'negocio' && (
+            <button 
+              onClick={toggleFavorite}
+              disabled={isLoading}
+              className={`absolute top-3 right-3 p-2 rounded-full shadow-md transition-all duration-300 z-10 ${
+                isFavorite 
+                  ? "bg-red-50 text-red-500 scale-110" 
+                  : "bg-white/80 text-gray-400 hover:text-red-400 hover:bg-white"
+              } ${showLoginNotice ? "animate-pulse ring-2 ring-red-400" : ""}`}
+            >
+              <Heart size={20} className={isFavorite ? "fill-current" : ""} />
+            </button>
+          )}
         </div>
 
         <div className="p-5 flex flex-col flex-1">

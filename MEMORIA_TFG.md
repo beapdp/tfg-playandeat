@@ -16,13 +16,25 @@ La aplicación resuelve el problema de la dispersión de información y la falta
 
 ## APARTADO 2) JUSTIFICACIÓN DEL PROYECTO
 
-La idea de este proyecto nace directamente de nuestra experiencia personal como familias con niños pequeños. En el día a día, nos encontramos con una gran dispersión de información a la hora de organizar planes. Aunque hoy en día hay muchísimos creadores de contenido que muestran sitios ideales en redes sociales, al final esa información se queda perdida en guardados de Instagram o Reels de TikTok que terminan olvidándose o siendo imposibles de localizar cuando realmente los necesitas.
+La idea de este proyecto nace de una problemática real detectada en el día a día de las familias con niños pequeños. Existe una gran dispersión de información a la hora de organizar planes de ocio gastronómico. Aunque los creadores de contenido muestran sitios ideales en redes sociales, esa información termina perdida en guardados de Instagram o TikTok que resultan imposibles de localizar cuando realmente se necesitan.
 
-El problema principal que queremos atacar es la falta de un lugar centralizado para esos "planes de sobremesa". Como padres y madres, vemos que muchas veces las quedadas con amigos se vuelven complicadas porque, una vez terminada la comida, los niños entran en un estado de aburrimiento que obliga a las familias a recurrir a las pantallas (móviles o tablets) para poder alargar un poco la reunión. 
+El problema principal que se pretende resolver es la falta de un lugar centralizado para esos "planes de sobremesa". Las quedadas con amigos se vuelven complicadas porque, una vez terminada la comida, los niños entran en un estado de aburrimiento que obliga a las familias a recurrir a las pantallas para alargar la reunión.
 
-**Play & Eat** surge para concentrar toda esa oferta dispersa en una sola herramienta. Queremos que las familias tengan la seguridad de que, al elegir un sitio de nuestra plataforma, los niños tendrán la oportunidad de jugar y divertirse mientras los adultos disfrutan de la sobremesa, eliminando la dependencia de los dispositivos electrónicos y recuperando el valor de compartir tiempo de calidad en comunidad. 
+**Play & Eat** surge para concentrar toda esa oferta dispersa en una sola herramienta, de forma que las familias tengan la seguridad de que, al elegir un sitio en la plataforma, los niños tendrán la oportunidad de jugar mientras los adultos disfrutan de la sobremesa, eliminando la dependencia de los dispositivos electrónicos.
 
-Además, este proyecto nos permite aplicar y consolidar conocimientos técnicos en un problema real, uniendo la gestión de datos con una interfaz diseñada para facilitar la vida de las familias.
+### Análisis Comparativo con aplicaciones existentes
+
+Se han analizado las plataformas de referencia del sector (**TripAdvisor** y **Yelp**) detectando las siguientes limitaciones frente a la propuesta de **Play & Eat**:
+
+| Característica | TripAdvisor / Yelp | Play & Eat |
+| :--- | :--- | :--- |
+| **Filtro "Family Friendly"** | Genérico y subjetivo, basado en opiniones individuales. | Basado en servicios técnicos verificables por el negocio. |
+| **Detalle de servicios infantiles** | No distingue entre tipos de entretenimiento. | Filtros específicos: Animación, Monitores, Zona de juegos. |
+| **Público objetivo** | Turista generalista. | Familias locales con necesidades recurrentes. |
+| **Concepto de "Sobremesa"** | No existe un enfoque en el tiempo del adulto. | Eje central del proyecto: ocio infantil para tranquilidad del adulto. |
+| **Panel para negocios** | Gestión de ficha genérica. | Panel específico para publicar servicios y fotos orientados a familias. |
+
+La principal mejora de **Play & Eat** respecto a las alternativas existentes radica en la **especialización**: mientras TripAdvisor y Yelp están diseñados para el viajero generalista, esta plataforma está construida desde cero para las necesidades concretas de las familias locales, convirtiendo la "búsqueda por azar" en una "búsqueda por necesidad técnica verificada".
 
 ---
 
@@ -44,22 +56,39 @@ Desarrollar una plataforma integral (web y móvil-responsiva) que conecte a fami
 
 ### 4.1) FUNDAMENTACIÓN TEÓRICA
 
-*   **Next.js (Frontend y Backend):** Framework de React que hemos utilizado para construir la aplicación completa. Gestiona toda la lógica de **Backend** mediante API Routes, actuando como el motor que procesa la información antes de enviarla a la base de datos.
-*   **TypeScript:** Utilizado para añadir tipado estático al código, reduciendo errores humanos y facilitando el mantenimiento a largo plazo.
-*   **Tailwind CSS:** Framework de estilos que permite un desarrollo visual rápido y consistente mediante clases de utilidad.
-*   **Supabase (Base de Datos):** Utilizado exclusivamente como nuestra base de datos relacional (PostgreSQL) en la nube. Es el sistema encargado de almacenar y proteger toda la información de los restaurantes y perfiles.
+*   **Next.js (Framework Fullstack):** Framework basado en React que se ha utilizado para construir la aplicación completa. Gestiona tanto el renderizado de la interfaz como la lógica del servidor mediante **API Routes** propias. Una de sus características más relevantes es el soporte para **Server-Side Rendering (SSR)**, lo que permite que las páginas se generen en el servidor antes de enviarse al navegador, mejorando significativamente el rendimiento y la indexación en buscadores (SEO). *Justificación de su elección:* a diferencia de un proyecto React puro, Next.js permite centralizar frontend y backend en un único proyecto, reduciendo la complejidad y el tiempo de desarrollo.
+
+*   **TypeScript:** Superset de JavaScript que añade tipado estático al código. Sus características principales son la detección de errores en tiempo de compilación (antes de ejecutar el programa) y el autocompletado en el editor. *Justificación:* se ha elegido frente a JavaScript puro porque en un proyecto con múltiples modelos de datos (perfiles, restaurantes, favoritos) el tipado garantiza la coherencia de los datos en todo el flujo de la aplicación, reduciendo errores humanos críticos.
+
+*   **Tailwind CSS:** Framework de estilos basado en clases de utilidad. En lugar de escribir hojas de estilo CSS separadas, los estilos se aplican directamente en el HTML/JSX mediante clases predefinidas. *Justificación:* su sistema de diseño por utilidades permite construir interfaces responsivas y consistentes de forma muy rápida, y el resultado final tiene un peso de CSS mínimo al eliminar automáticamente los estilos no utilizados.
+
+*   **Supabase (Base de Datos):** Plataforma de base de datos como servicio (DBaaS) que proporciona una instancia de **PostgreSQL** en la nube con panel de administración visual. Sus características principales son la gestión de autenticación de usuarios, el almacenamiento de archivos y las políticas de seguridad a nivel de fila (Row Level Security - RLS). *Justificación:* se ha elegido como sistema de persistencia por su robustez, su integración nativa con sistemas de autenticación mediante JWT y la posibilidad de gestionar todos los datos desde un único panel sin necesidad de configurar un servidor propio.
 
 ### 4.2) MATERIALES Y MÉTODOS
 
-*   **Metodología de trabajo:** Hemos aplicado una **Metodología Ágil e Iterativa**. En lugar de intentar construir todo de golpe, hemos ido desarrollando la aplicación por bloques funcionales (Sprints). Esto nos ha permitido probar cada parte de forma independiente y corregir fallos antes de pasar a la siguiente fase.
+#### Metodología de Trabajo: Desarrollo Ágil (Agile)
 
-*   **Planificación del proyecto:**
-    1.  Análisis y Diseño (Semanas 1-2): Definición de la idea y prototipado.
-    2.  Infraestructura (Semana 3): Configuración de Next.js y base de datos en Supabase.
-    3.  Backend (Semanas 4-6): Desarrollo de controladores, servicios y autenticación.
-    4.  Frontend (Semanas 7-9): Construcción de componentes e integración con la API.
-    5.  Pruebas y QA (Semanas 10-11): Testeo de errores y optimización.
-    6.  Documentación (Semana 12): Redacción final de la memoria y vídeo.
+Se ha aplicado una **Metodología Ágil** basada en ciclos iterativos cortos denominados **Sprints** (de dos semanas de duración). La metodología ágil se caracteriza por los siguientes principios:
+
+- **Entrega incremental:** el software se construye y se entrega por bloques funcionales completos, no todo de una vez al final.
+- **Adaptabilidad:** permite cambiar los requisitos durante el desarrollo sin que ello suponga un bloqueo para el proyecto.
+- **Revisión continua:** al final de cada Sprint se evalúa el resultado y se replanifica el siguiente ciclo.
+- **Colaboración:** la comunicación constante entre los miembros del equipo es fundamental.
+
+Esta metodología se eligió frente al modelo en **cascada** (Waterfall) porque, al tratarse de un proyecto con requisitos que podían evolucionar durante el desarrollo (como la incorporación del sistema de favoritos), la flexibilidad ágil resultaba más adecuada que un modelo secuencial rígido donde cada fase debe completarse antes de iniciar la siguiente.
+
+#### Planificación del Proyecto
+
+El desarrollo se ha estructurado en un cronograma de 12 semanas con una carga estimada de aproximadamente 300 horas totales:
+
+| Fase | Descripción | Semanas | Horas Est. |
+| :--- | :--- | :--- | :--- |
+| **I. Análisis y Diseño** | Definición de requisitos, casos de uso y prototipado de la interfaz. | 1-2 | 40h |
+| **II. Infraestructura** | Configuración de Next.js, Supabase y estructura de carpetas del proyecto. | 3 | 20h |
+| **III. Backend** | Desarrollo de la API REST, controladores (`authController`, `restaurantController`), servicios (`authService`, `favoriteService`) y políticas de seguridad RLS. | 4-6 | 80h |
+| **IV. Frontend** | Construcción de componentes (`RestaurantCard`, `Header`, `HeroBanner`), páginas de usuario y panel de negocio, e integración con la API. | 7-9 | 90h |
+| **V. Pruebas y QA** | Pruebas funcionales de flujos de usuario (registro, login, subida de restaurantes, favoritos), corrección de errores y optimización de rendimiento. | 10-11 | 40h |
+| **VI. Documentación** | Redacción de la memoria, guía técnica y vídeo demostrativo. | 12 | 30h |
 
 *   **Diagrama de la base de datos:**
 ```mermaid
@@ -112,33 +141,18 @@ graph TD
 ```
 
 *   **Estructura del proyecto:**
-    *   **`/app`**: Contiene las rutas y páginas de la aplicación. Aquí se encuentra tanto la lógica visual como los puntos de entrada de la API.
-    *   **`/components`**: Piezas de interfaz reutilizables (botones, tarjetas, navegadores) para evitar duplicidad de código.
-    *   **`/lib`**: Contiene el "cerebro" de la aplicación (Controllers y Services).
-    *   **`/public`**: Almacena recursos estáticos como logos e iconos.
 
-#### **Diagramas de casos de uso**
-Representación de las interacciones principales de los usuarios con el sistema:
+    El proyecto sigue una estructura de carpetas organizada por responsabilidades, lo que facilita el mantenimiento y la escalabilidad:
 
-```mermaid
-graph TD
-    User((Usuario)) --> Login[Iniciar Sesión]
-    User --> Registro[Registrarse]
-    
-    subgraph Familia
-        FamiliaUser((Familia)) --> Buscar[Buscar Restaurantes]
-        FamiliaUser --> Detalle[Ver ficha de restaurante]
-        FamiliaUser --> Favoritos[Guardar favoritos]
-    end
-    
-    subgraph Negocio
-        NegocioUser((Dueño de Negocio)) --> CrearRest[Dar de alta restaurante]
-        NegocioUser --> Gestionar[Gestionar información y fotos]
-    end
-```
+    *   **`/app`**: Contiene todas las rutas y páginas de la aplicación, gestionadas por el sistema de enrutamiento *App Router* de Next.js. Dentro de esta carpeta se distinguen dos tipos de contenido: las páginas visibles para el usuario (ej. `/restaurantes`, `/perfil`, `/admin`) y los puntos de entrada de la API REST (carpeta `/app/api/`), que actúan como el backend del sistema.
+    *   **`/components`**: Almacena piezas de interfaz reutilizables e independientes, como `RestaurantCard.tsx`, `Header.tsx` o `HeroBanner.tsx`. Este patrón evita la duplicidad de código y garantiza que cualquier cambio visual se aplique de forma consistente en toda la aplicación.
+    *   **`/lib`**: Contiene el núcleo lógico del backend, organizado en dos subcarpetas:
+        *   `/lib/backend/controllers/`: Los **controladores** (ej. `authController.ts`, `restaurantController.ts`) reciben las peticiones de la API, validan los datos y delegan la operación al servicio correspondiente.
+        *   `/lib/backend/services/`: Los **servicios** (ej. `authService.ts`, `favoriteService.ts`) son los únicos que interactúan directamente con la base de datos de Supabase, manteniendo la lógica de negocio separada del resto.
+    *   **`/public`**: Almacena recursos estáticos como el logotipo e iconos de la aplicación.
 
-#### **Breve análisis del código**
-El corazón del sistema reside en el patrón **Controller-Service**. El `authService.ts` gestiona la creación de perfiles y sesiones en Supabase, mientras que el componente `FeaturedRestaurants.tsx` realiza consultas asíncronas para mostrar los datos en tiempo real de la base de datos, eliminando la necesidad de datos estáticos en el código.
+#### Breve análisis del código
+El núcleo del sistema reside en el patrón **Controller-Service**. El `authService.ts` gestiona la creación de perfiles y sesiones en Supabase, mientras que los componentes del frontend realizan consultas asíncronas para mostrar los datos en tiempo real, eliminando la necesidad de datos estáticos en el código.
 
 ### 4.3) RESULTADOS Y ANÁLISIS
 Se ha logrado implementar una aplicación funcional que cumple con todos los requisitos iniciales. Las familias pueden registrarse y acceder a un listado dinámico de restaurantes, mientras que los dueños de negocios pueden publicar sus locales con éxito. El rendimiento del sistema es excelente gracias al uso de Next.js.
@@ -146,48 +160,18 @@ Se ha logrado implementar una aplicación funcional que cumple con todos los req
 ---
 
 ## APARTADO 5) CONCLUSIONES
-El desarrollo de **Play & Eat** nos ha permitido aplicar de forma práctica los conocimientos adquiridos durante el grado, enfrentándonos a retos reales como la gestión de sesiones de usuario y el diseño responsivo. Hemos cumplido el objetivo de crear una herramienta útil que ataca un problema real de las familias actuales.
+El desarrollo de **Play & Eat** ha permitido aplicar de forma práctica los conocimientos adquiridos durante el grado, enfrentando retos reales de la ingeniería de software como la gestión de sesiones, el diseño de APIs REST seguras y el desarrollo de interfaces responsivas. Se ha cumplido el objetivo de crear una herramienta útil que resuelve un problema real de las familias actuales.
 
 ---
 
 ## APARTADO 6) LÍNEAS DE INVESTIGACIÓN FUTURAS
-Como ampliaciones para el futuro, hemos identificado las siguientes mejoras:
+Como ampliaciones identificadas para el futuro del proyecto, se proponen las siguientes líneas de desarrollo:
 1.  **Sistema de Recomendaciones basado en IA:** Implementar algoritmos de aprendizaje automático para sugerir restaurantes de forma personalizada según la edad de los hijos y el historial de visitas de la familia.
 2.  **Comunidad y Quedadas (Playdates):** Crear un espacio social donde las familias puedan contactar entre sí para organizar comidas grupales y fomentar la socialización de los niños.
-3.  **Realidad Aumentada (Tour Virtual):** Integrar visualizaciones en 3D o realidad aumentada de las zonas de juego para que los padres puedan evaluar la seguridad y el tipo de instalaciones antes de realizar la reserva.
-1.  **Sistema de valoraciones:** Permitir que las familias dejen comentarios y notas.
-2.  **Integración de Mapas:** Mostrar los restaurantes en un mapa interactivo.
-3.  **Sistema de Reservas:** Permitir reservar mesa directamente.
-
----
-
-## APARTADO 7) BIBLIOGRAFÍA Y WEBGRAFÍA
-*   Next.js. (2024). *Next.js Documentation*. Recuperado de [https://nextjs.org/docs](https://nextjs.org/docs)
-*   Supabase. (2024). *Supabase Documentation*. Recuperado de [https://supabase.com/docs](https://supabase.com/docs)
-*   Tailwind CSS. (2024). *Tailwind CSS Documentation*. Recuperado de [https://tailwindcss.com/docs](https://tailwindcss.com/docs)
-
-
-*   **Breve análisis del código:**
-    El corazón del sistema reside en el patrón **Controller-Service**. El `authService.ts` gestiona la creación de perfiles y sesiones en Supabase, mientras que el componente `FeaturedRestaurants.tsx` realiza consultas asíncronas para mostrar los datos en tiempo real de la base de datos, eliminando la necesidad de datos estáticos en el código.
-
-### 4.3) RESULTADOS Y ANÁLISIS
-
-Se ha logrado implementar una aplicación funcional que cumple con todos los requisitos iniciales. Las familias pueden registrarse y acceder a un listado dinámico de restaurantes, mientras que los dueños de negocios pueden publicar sus locales con éxito. El rendimiento del sistema es excelente gracias al uso de Next.js, y la integración con Supabase ha demostrado ser una solución robusta para la gestión de datos y usuarios.
-
----
-
-## APARTADO 5) CONCLUSIONES
-
-El desarrollo de **Play & Eat** nos ha permitido aplicar de forma práctica los conocimientos adquiridos durante el grado, enfrentándonos a retos reales de la ingeniería de software como la gestión de sesiones de usuario y el diseño responsivo. Hemos cumplido el objetivo de crear una herramienta útil que ataca un problema real de las familias actuales. Como aprendizaje principal, destacamos la importancia de una buena arquitectura inicial para facilitar los cambios posteriores.
-
----
-
-## APARTADO 6) LÍNEAS DE INVESTIGACIÓN FUTURAS
-
-Como ampliaciones para el futuro, hemos identificado las siguientes mejoras:
-1.  **Sistema de valoraciones:** Permitir que las familias dejen comentarios y notas sobre los servicios infantiles.
-2.  **Integración de Mapas:** Mostrar los restaurantes en un mapa interactivo basado en la ubicación del usuario.
-3.  **Sistema de Reservas:** Permitir reservar mesa directamente desde la plataforma indicando el número de niños y adultos.
+3.  **Realidad Aumentada (Tour Virtual):** Integrar visualizaciones en 3D o realidad aumentada de las zonas de juego para que los padres puedan evaluar la seguridad de las instalaciones antes de realizar la reserva.
+4.  **Sistema de valoraciones:** Permitir que las familias publiquen comentarios y valoraciones sobre los servicios infantiles de cada restaurante.
+5.  **Integración de Mapas:** Mostrar los restaurantes en un mapa interactivo basado en la ubicación del usuario.
+6.  **Sistema de Reservas:** Permitir reservar mesa directamente desde la plataforma, indicando el número de niños y adultos.
 
 ---
 
@@ -197,3 +181,4 @@ Como ampliaciones para el futuro, hemos identificado las siguientes mejoras:
 *   Supabase. (2024). *Supabase Documentation*. Recuperado de [https://supabase.com/docs](https://supabase.com/docs)
 *   Tailwind CSS. (2024). *Tailwind CSS Documentation*. Recuperado de [https://tailwindcss.com/docs](https://tailwindcss.com/docs)
 *   MDN Web Docs. (2024). *JavaScript Guide*. Recuperado de [https://developer.mozilla.org](https://developer.mozilla.org)
+*   Agile Alliance. (2024). *What is Agile?*. Recuperado de [https://www.agilealliance.org/agile101/](https://www.agilealliance.org/agile101/)

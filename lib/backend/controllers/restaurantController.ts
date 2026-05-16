@@ -57,4 +57,21 @@ export class RestaurantController {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
   }
+
+  // Controlador para editar un restaurante (Backend)
+  static async handleUpdateRestaurant(id: string, req: Request) {
+    try {
+      const body = await req.json();
+      const ownerId = body.ownerId; // Extraemos el ID del creador para seguridad
+
+      if (!ownerId) {
+        return NextResponse.json({ error: 'ownerId es obligatorio para actualizar.' }, { status: 400 });
+      }
+
+      const data = await RestaurantService.updateRestaurant(id, body, ownerId);
+      return NextResponse.json({ message: 'Restaurante actualizado con éxito', data });
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
 }

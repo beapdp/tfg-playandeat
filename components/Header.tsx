@@ -18,17 +18,26 @@ export default function Header() {
   // Estado para guardar la sesión del usuario actual
   const [user, setUser] = useState<any>(null);
   const [rol, setRol] = useState<string | null>(null);
+  // Nuevo estado para guardar el nombre del usuario y poder pintarlo en la web
+  const [nombre, setNombre] = useState<string | null>(null);
 
   // useEffect se ejecuta al cargar el componente
   useEffect(() => {
     const syncUser = (session: any) => {
       if (session?.user) {
         setUser(session.user);
+        
+        // Supabase guarda información extra dentro del token JWT en el objeto user_metadata
+        // De aquí podemos extraer el rol y el nombre que guardamos en el momento del registro sin tener que hacer una consulta lenta a la base de datos
         const rolMetadata = session.user.user_metadata?.rol;
+        const nombreMetadata = session.user.user_metadata?.nombre;
+        
         setRol(rolMetadata || null);
+        setNombre(nombreMetadata || null);
       } else {
         setUser(null);
         setRol(null);
+        setNombre(null);
       }
     };
 
@@ -58,6 +67,7 @@ export default function Header() {
       // Limpiamos todo al momento
       setUser(null);
       setRol(null);
+      setNombre(null);
       setIsOpen(false);
 
       // Redirigimos forzando recarga para limpiar memoria
@@ -102,7 +112,8 @@ export default function Header() {
                 className="flex items-center gap-2 text-secondary font-semibold hover:text-primary transition-colors text-sm"
               >
                 <User size={18} />
-                Mi Panel
+                {/* Mostramos el nombre dinámicamente. Si por algún error no hay nombre, mostramos 'Usuario' por defecto */}
+                Hola, {nombre || 'Usuario'}
               </Link>
               <button 
                 onClick={handleLogout}
@@ -148,7 +159,8 @@ export default function Header() {
             <>
               <div className="p-3 bg-gray-50 rounded-xl mb-2">
                 <p className="text-xs text-gray-500">Conectado como:</p>
-                <p className="text-sm font-bold text-secondary truncate">{user.email}</p>
+                {/* En la versión móvil también mostramos el nombre del usuario o su email si falta el nombre */}
+                <p className="text-sm font-bold text-secondary truncate">{nombre || user.email}</p>
               </div>
               <Link 
                 href={rol === 'negocio' ? '/admin' : '/perfil'} 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Store, PlusCircle, BarChart3 } from 'lucide-react';
+import { Store, PlusCircle, BarChart3, Info } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminPage() {
@@ -133,9 +133,14 @@ export default function AdminPage() {
                         <p className="text-xs text-gray-500">{r.location}</p>
                       </div>
                     </div>
-                    <Link href={`/restaurantes/${r.id}`} className="text-xs font-bold text-primary hover:underline">
-                      Ver ficha
-                    </Link>
+                    <div className="flex flex-col gap-2 items-end">
+                      <Link href={`/admin/editar-restaurante/${r.id}`} className="text-xs font-bold text-orange-500 hover:underline">
+                        Editar datos
+                      </Link>
+                      <Link href={`/restaurantes/${r.id}`} className="text-xs font-bold text-primary hover:underline">
+                        Ver ficha
+                      </Link>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -165,6 +170,25 @@ export default function AdminPage() {
           </div>
         </div>
 
+      </div>
+
+      {/* Nota informativa sobre la UX para las cuentas de negocio */}
+      <div className="mt-8 bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4 shadow-sm">
+        <div className="text-blue-500 mt-1 shrink-0">
+          <Info size={24} />
+        </div>
+        <div>
+          <h3 className="font-bold text-secondary mb-1">Nota sobre tu cuenta de negocio</h3>
+          <p className="text-sm text-gray-600">
+            Tu perfil actual está diseñado exclusivamente para la gestión de locales comerciales. 
+            Si deseas interactuar con la plataforma como usuario (por ejemplo, guardar tus propios 
+            restaurantes favoritos para visitarlos en familia), te invitamos a 
+            <Link href="/registro" className="text-primary font-bold hover:underline mx-1">
+              crear una cuenta de Familia
+            </Link> 
+            gratuita con otro correo electrónico.
+          </p>
+        </div>
       </div>
     </div>
   );

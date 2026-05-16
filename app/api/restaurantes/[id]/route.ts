@@ -11,3 +11,11 @@ export async function GET(
   const { id } = await params;
   return RestaurantController.handleGetRestaurantById(id);
 }
+
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  return RestaurantController.handleUpdateRestaurant(id, request);
+}

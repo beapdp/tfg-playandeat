@@ -1,8 +1,8 @@
 import { RestaurantService } from '@/lib/backend/services/restaurantService';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Star, MapPin, CheckCircle2 } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import BackButton from '@/components/BackButton';
 
 export default async function RestauranteDetallePage({
   params,
@@ -26,9 +26,7 @@ export default async function RestauranteDetallePage({
 
   return (
     <div className="w-full max-w-4xl mx-auto py-10 px-4">
-      <Link href="/" className="text-primary font-semibold hover:underline mb-6 inline-block">
-        &larr; Volver
-      </Link>
+      <BackButton />
 
       {/* Tarjeta grande de detalle */}
       <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100">

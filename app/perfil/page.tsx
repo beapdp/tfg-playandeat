@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, Settings, User, MessageSquare } from 'lucide-react';
+import { Heart, User, MessageSquare } from 'lucide-react';
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -79,8 +79,8 @@ export default function PerfilPage() {
       <h1 className="text-3xl font-extrabold text-secondary mb-2">Panel de Familia</h1>
       <p className="text-gray-500 mb-8">¡Hola, {perfil?.nombre || 'Familia'}! Gestiona tus sitios favoritos y tus valoraciones aquí.</p>
 
-      {/* Grid responsivo de 4 columnas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Grid responsivo de 3 columnas centrado */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
         
         {/* Tarjeta de Favoritos */}
         <Link href="/favoritos" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group block">
@@ -90,8 +90,8 @@ export default function PerfilPage() {
           <h3 className="font-bold text-lg text-secondary">Mis Favoritos</h3>
           <p className="text-sm text-gray-500 mt-2">Guarda tus restaurantes preferidos para tenerlos a mano.</p>
         </Link>
-
-        {/* Tarjeta de Mis Valoraciones [NUEVO] */}
+ 
+        {/* Tarjeta de Mis Valoraciones */}
         <Link href="/perfil/valoraciones" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group block">
           <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <MessageSquare size={32} className="text-amber-500" />
@@ -99,25 +99,16 @@ export default function PerfilPage() {
           <h3 className="font-bold text-lg text-secondary">Mis Valoraciones</h3>
           <p className="text-sm text-gray-500 mt-2">Revisa y edita las opiniones y puntuaciones que has dejado.</p>
         </Link>
-
+ 
         {/* Tarjeta de Perfil */}
         <Link href="/perfil/datos" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group block">
           <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <User size={32} />
           </div>
           <h3 className="font-bold text-lg text-secondary">Mis Datos</h3>
-          <p className="text-sm text-gray-500 mt-2">Edita tu nombre y preferencias de cuenta.</p>
+          <p className="text-sm text-gray-500 mt-2">Administra tu perfil y la seguridad de tu cuenta.</p>
         </Link>
-
-        {/* Tarjeta de Ajustes */}
-        <Link href="/perfil/ajustes" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group block">
-          <div className="w-16 h-16 bg-gray-50 text-gray-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <Settings size={32} />
-          </div>
-          <h3 className="font-bold text-lg text-secondary">Ajustes</h3>
-          <p className="text-sm text-gray-500 mt-2">Configura notificaciones e idioma.</p>
-        </Link>
-
+ 
       </div>
 
       <div className="mt-12 text-center">

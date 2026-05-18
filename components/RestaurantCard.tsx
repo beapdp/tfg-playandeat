@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Shapes, Palette, Music, Heart } from 'lucide-react';
+import { Star, Shapes, Palette, Music, Heart, Gamepad2, Utensils, Baby, Trees } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
@@ -109,11 +109,32 @@ export default function RestaurantCard({ restaurant }: Props) {
     const colorClass = bgColors[index % bgColors.length];
 
     let Icon = Shapes;
-    if (service === 'animacion') Icon = Palette;
-    if (service === 'musica') Icon = Music;
+    let label = service;
+
+    const normalizedService = service.toLowerCase().replace('_', '-');
+
+    if (normalizedService === 'zona-juegos') {
+      Icon = Gamepad2;
+      label = 'Zona de Juegos';
+    } else if (normalizedService === 'menu-infantil') {
+      Icon = Utensils;
+      label = 'Menú Infantil';
+    } else if (normalizedService === 'cambiadores') {
+      Icon = Baby;
+      label = 'Cambiadores';
+    } else if (normalizedService === 'animacion') {
+      Icon = Palette;
+      label = 'Animación';
+    } else if (normalizedService === 'terraza') {
+      Icon = Trees;
+      label = 'Terraza amplia';
+    } else if (normalizedService === 'musica') {
+      Icon = Music;
+      label = 'Música';
+    }
 
     return (
-      <div key={service} className={`p-1.5 rounded-md ${colorClass}`} title={service}>
+      <div key={service} className={`p-1.5 rounded-md ${colorClass}`} title={label}>
         <Icon size={16} strokeWidth={2} />
       </div>
     );
@@ -169,10 +190,6 @@ export default function RestaurantCard({ restaurant }: Props) {
           <div className="flex justify-between items-center mt-2 pt-4 border-t border-gray-100">
             <div className="flex gap-2">
                {restaurant.services.map((service, idx) => renderServiceIcon(service, idx))}
-            </div>
-
-            <div className="w-8 h-8 rounded-full border border-blue-200 text-blue-400 flex items-center justify-center bg-blue-50">
-               <span className="text-[10px] font-bold">P&E</span>
             </div>
           </div>
         </div>

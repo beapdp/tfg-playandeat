@@ -57,7 +57,7 @@ export class RestaurantService {
       lat: restaurantData.lat ? parseFloat(restaurantData.lat) : null,
       lng: restaurantData.lng ? parseFloat(restaurantData.lng) : null,
       image_url: restaurantData.imageUrl,
-      rating: restaurantData.rating || 5.0,
+      rating: restaurantData.rating || 0.0, // <-- Cambiado de 5.0 a 0.0 para restaurantes nuevos sin opiniones
       food_type: restaurantData.foodType,
       services: restaurantData.services || [],
       owner_id: restaurantData.ownerId // Relacionamos con el usuario que lo crea

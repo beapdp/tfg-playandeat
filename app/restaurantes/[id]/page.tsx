@@ -51,9 +51,12 @@ export default async function RestauranteDetallePage({
             <h1 className="text-3xl md:text-5xl font-extrabold text-secondary">
               {restaurante.name}
             </h1>
-            <div className="flex items-center bg-orange-50 text-primary px-3 py-1 rounded-full font-bold">
+            <div 
+              className="flex items-center bg-orange-50 text-primary px-3 py-1 rounded-full font-bold"
+              title={Number(restaurante.rating) === 0 ? "Sin valoraciones aún" : `Valoración media de ${restaurante.rating}`}
+            >
               <Star size={18} className="fill-primary mr-1" />
-              {restaurante.rating}
+              {Number(restaurante.rating) > 0 ? Number(restaurante.rating).toFixed(1) : 'Nuevo'}
             </div>
           </div>
 

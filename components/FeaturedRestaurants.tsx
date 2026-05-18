@@ -29,7 +29,7 @@ export default async function FeaturedRestaurants() {
               id: restaurant.id,
               name: restaurant.name,
               imageUrl: restaurant.image_url, // Mapeamos image_url de la BD a imageUrl del componente
-              rating: restaurant.rating || 5,
+              rating: restaurant.rating || 0, // <-- Cambiado de 5 a 0 para restaurantes sin opiniones
               services: restaurant.services || []
             }} 
           />

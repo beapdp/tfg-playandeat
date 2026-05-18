@@ -16,6 +16,7 @@ export default function EditarRestaurantePage({ params }: { params: Promise<{ id
   const [cargando, setCargando] = useState(false);
   const [cargandoDatos, setCargandoDatos] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [categorias, setCategorias] = useState<{ id: string; nombre: string; slug: string; }[]>([]);
 
   // Estados del formulario
   const [formData, setFormData] = useState({
@@ -49,6 +50,17 @@ export default function EditarRestaurantePage({ params }: { params: Promise<{ id
       
       const currentUserId = session.user.id;
       setUserId(currentUserId);
+
+      // Cargar categorías dinámicas
+      try {
+        const catRes = await fetch('/api/categorias');
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          setCategorias(catData);
+        }
+      } catch (catErr) {
+        console.error("Error al cargar categorías en edición:", catErr);
+      }
 
       // 2. Hacer petición GET al backend para cargar los datos actuales del restaurante
       try {
@@ -214,17 +226,25 @@ export default function EditarRestaurantePage({ params }: { params: Promise<{ id
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700">Tipo de Comida</label>
+              <label className="text-sm font-bold text-gray-700">Tipo de Comida / Categoría</label>
               <select 
                 className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
                 value={formData.foodType}
                 onChange={e => setFormData({...formData, foodType: e.target.value})}
               >
-                <option value="mediterranea">Mediterránea</option>
-                <option value="italiana">Italiana</option>
-                <option value="hamburgueseria">Hamburguesería</option>
-                <option value="asiatica">Asiática</option>
-                <option value="tradicional">Tradicional</option>
+                {categorias.length > 0 ? (
+                  categorias.map(cat => (
+                    <option key={cat.id} value={cat.slug}>{cat.nombre}</option>
+                  ))
+                ) : (
+                  <>
+                    <option value="mediterranea">Mediterránea</option>
+                    <option value="italiana">Italiana</option>
+                    <option value="hamburgueseria">Hamburguesería</option>
+                    <option value="asiatica">Asiática</option>
+                    <option value="tradicional">Tradicional</option>
+                  </>
+                )}
               </select>
             </div>
           </div>

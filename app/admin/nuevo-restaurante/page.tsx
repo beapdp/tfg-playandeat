@@ -31,16 +31,33 @@ export default function NuevoRestaurantePage() {
     { id: 'terraza', label: 'Terraza amplia' }
   ];
 
+  const [categorias, setCategorias] = useState<{ id: string; nombre: string; slug: string; }[]>([]);
+
   useEffect(() => {
-    const checkUser = async () => {
+    const checkUserAndLoadCategories = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push('/login');
-      } else {
-        setUserId(session.user.id);
+        return;
+      }
+      setUserId(session.user.id);
+
+      // Cargar categorías dinámicas
+      try {
+        const res = await fetch('/api/categorias');
+        if (res.ok) {
+          const data = await res.json();
+          setCategorias(data);
+          // Si hay categorías precargadas, establecemos por defecto la primera
+          if (data.length > 0) {
+            setFormData(prev => ({ ...prev, foodType: data[0].slug }));
+          }
+        }
+      } catch (err) {
+        console.error('Error al cargar categorías dinámicas:', err);
       }
     };
-    checkUser();
+    checkUserAndLoadCategories();
   }, [router]);
 
   const toggleServicio = (id: string) => {
@@ -152,17 +169,25 @@ export default function NuevoRestaurantePage() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700">Tipo de Comida</label>
+              <label className="text-sm font-bold text-gray-700">Tipo de Comida / Categoría</label>
               <select 
                 className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white"
                 value={formData.foodType}
                 onChange={e => setFormData({...formData, foodType: e.target.value})}
               >
-                <option value="mediterranea">Mediterránea</option>
-                <option value="italiana">Italiana</option>
-                <option value="hamburgueseria">Hamburguesería</option>
-                <option value="asiatica">Asiática</option>
-                <option value="tradicional">Tradicional</option>
+                {categorias.length > 0 ? (
+                  categorias.map(cat => (
+                    <option key={cat.id} value={cat.slug}>{cat.nombre}</option>
+                  ))
+                ) : (
+                  <>
+                    <option value="mediterranea">Mediterránea</option>
+                    <option value="italiana">Italiana</option>
+                    <option value="hamburgueseria">Hamburguesería</option>
+                    <option value="asiatica">Asiática</option>
+                    <option value="tradicional">Tradicional</option>
+                  </>
+                )}
               </select>
             </div>
           </div>

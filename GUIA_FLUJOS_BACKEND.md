@@ -227,13 +227,14 @@ Supabase busca en la tabla 'restaurantes' donde id = el valor de la URL
 Dueño rellena el formulario (nombre, descripción, foto, servicios...)
     ↓
 POST /api/restaurantes
-Body: { name, description, location, imageUrl, foodType, services, ownerId }
+Body: { name, description, location, lat, lng, imageUrl, foodType, services, ownerId }
     ↓
 RestaurantController.handleCreateRestaurant()
     ↓
 El servicio adapta los nombres de los campos al formato de la base de datos:
   imageUrl → image_url
   foodType → food_type
+  lat / lng → se guardan como NUMERIC para el mapa
   ownerId  → owner_id (vincula el restaurante con el usuario que lo creó)
     ↓
 Supabase inserta el nuevo restaurante en la tabla 'restaurantes'
@@ -289,6 +290,93 @@ Consulta con JOIN en Supabase:
 
 ---
 
+## FLUJO 6: MAPA INTERACTIVO Y GEOLOCALIZACIÓN
+
+### ¿Qué ocurre cuando el usuario entra en la sección "Mapa Interactivo"?
+
+**Archivos implicados:**
+1. `app/mapa/page.tsx` → Página principal (Server Component)
+2. `lib/backend/services/restaurantService.ts` → Capa de datos
+3. `components/MapWrapper.tsx` → Envoltorio de cliente (para evitar errores de SSR)
+4. `components/RestaurantsMap.tsx` → El mapa real (Leaflet)
+
+---
+
+**Paso 1 — Carga de datos en el servidor** (`app/mapa/page.tsx`)
+
+Al ser una página de Next.js, lo primero que ocurre es que el servidor ejecuta la función `MapaPage()`:
+```typescript
+const restaurantes = await RestaurantService.getRestaurants();
+```
+Esto descarga todos los restaurantes (incluyendo sus campos `lat` y `lng`) antes de que la página llegue al navegador del usuario.
+
+**Paso 2 — El Wrapper de Cliente** (`components/MapWrapper.tsx`)
+
+Como los mapas interactivos (Leaflet) necesitan el objeto `window` del navegador para funcionar, no se pueden renderizar en el servidor. 
+- Usamos `dynamic(() => import(...), { ssr: false })` dentro del `MapWrapper`.
+- Esto le dice a Next.js: "No intentes pintar el mapa en el servidor, espera a que el usuario tenga la página abierta en su navegador".
+
+**Paso 3 — Renderizado y Filtrado** (`components/RestaurantsMap.tsx`)
+
+Una vez en el navegador del usuario:
+1. El componente recibe la lista de `restaurantes`.
+2. **Filtrado de seguridad**: Se eliminan de la lista aquellos que no tengan coordenadas (`lat` o `lng`) para evitar errores visuales.
+3. **Pintado de Marcadores**: Se recorre la lista y se dibuja un `<Marker>` (pin naranja) en cada coordenada.
+4. **Interactividad**: Al pinchar en un marcador, se abre un `<Popup>` que extrae los datos (nombre, foto) del objeto restaurante y permite navegar a su ficha.
+
+
+---
+
+## FLUJO 7: SISTEMA DE VALORACIONES (Reseñas y Estrellas)
+
+### ¿Qué ocurre cuando una familia califica un restaurante con estrellas y un comentario?
+
+**Archivos implicados (en orden de ejecución):**
+1. `components/RestaurantReviews.tsx` → El formulario y lista en el frontend (Client Component)
+2. `app/api/valoraciones/route.ts` → El endpoint receptor
+3. `lib/backend/controllers/valoracionController.ts` → El controlador (valida sesión y datos)
+4. `lib/backend/services/valoracionService.ts` → El servicio (guarda y recalcula promedio)
+5. **Supabase** → Base de datos (tabla `valoraciones` y actualización en `restaurantes`)
+
+---
+
+**Paso 1 — El usuario interactúa en la pantalla** (`RestaurantReviews.tsx`)
+- Al estar logueado como "familia", se le muestra el formulario de 1 a 5 estrellas y un campo de texto.
+- Selecciona las estrellas (que cambian de color visualmente) y escribe un comentario.
+- Al pulsar "Publicar valoración", se ejecuta la función `handleSubmit`.
+
+**Paso 2 — Llamada HTTP POST a nuestra API REST**
+Se realiza una petición asíncrona:
+```typescript
+POST /api/valoraciones
+Body: { restauranteId, puntuacion, comentario }
+```
+
+**Paso 3 — Mapeo de la ruta** (`app/api/valoraciones/route.ts`)
+Next.js detecta el método `POST` y redirige la petición al controlador:
+```typescript
+export async function POST(request: Request) {
+  return ValoracionController.handleCreateValoracion(request);
+}
+```
+
+**Paso 4 — El Controlador valida las reglas de negocio** (`valoracionController.ts`)
+- Comprueba que el usuario está logueado a través del token de Supabase.
+- Valida que la puntuación esté estrictamente entre 1 y 5.
+- Si todo es correcto, llama al método del servicio: `ValoracionService.crearValoracion(...)`.
+
+**Paso 5 — El Servicio aplica la persistencia y actualiza el promedio** (`valoracionService.ts`)
+1. **Inserción:** Guarda la nueva opinión en la tabla `valoraciones` relacionando el `perfil_id` del usuario y el `restaurante_id`.
+2. **Cálculo de la media:** Consulta todas las valoraciones asociadas a ese restaurante específico.
+3. **Fórmula:** Suma todas las puntuaciones y las divide por el número total de reseñas para hallar el promedio aritmético exacto (con 1 decimal).
+4. **Actualización:** Hace un `UPDATE` en la tabla `restaurantes` actualizando la columna `rating` con la nueva media calculada.
+
+**Paso 6 — Recarga de interfaz** (`RestaurantReviews.tsx`)
+- Se muestra un mensaje de éxito.
+- Tras 1.5 segundos, se recarga la página para que la ficha principal del restaurante muestre el promedio de estrellas actualizado.
+
+---
+
 ## RESUMEN: Mapa de todos los flujos
 
 ```
@@ -312,4 +400,9 @@ FAVORITOS (TOGGLE)→  RestaurantCard → getUser() → consulta tabla 'favorito
                       → ¿existe? BORRA : INSERTA
 
 VER FAVORITOS     →  favoritos/page → tabla 'favoritos' JOIN tabla 'restaurantes'
+
+VALORACIONES      →  RestaurantReviews → POST /api/valoraciones → valoracionController
+                      → valoracionService.crearValoracion → tabla 'valoraciones'
+                      → Recalcula media y actualiza rating de 'restaurantes'
 ```
+

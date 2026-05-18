@@ -1,33 +1,34 @@
 import Link from 'next/link';
-import { MapPin, HardHat, ArrowLeft } from 'lucide-react';
+import { MapPin, ArrowLeft } from 'lucide-react';
+import { RestaurantService } from '@/lib/backend/services/restaurantService';
+import MapWrapper from '@/components/MapWrapper';
 
-export default function MapaPage() {
+// Forzamos que esta página se renderice dinámicamente en el servidor para obtener los datos más frescos
+export const dynamic = 'force-dynamic';
+
+export default async function MapaPage() {
+  // Obtenemos todos los restaurantes desde la capa de servicios
+  const restaurantes = await RestaurantService.getRestaurants();
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
-      <div className="bg-orange-50 p-6 rounded-full mb-6 relative">
-        <MapPin size={64} className="text-primary" />
-        <div className="absolute -bottom-2 -right-2 bg-secondary text-white p-2 rounded-full">
-          <HardHat size={24} />
-        </div>
+    <div className="max-w-6xl mx-auto py-12 px-4">
+      <Link href="/" className="flex items-center gap-2 text-primary font-bold hover:underline mb-8">
+        <ArrowLeft size={20} />
+        Volver al Inicio
+      </Link>
+      
+      <div className="mb-8">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-secondary flex items-center gap-3">
+          <MapPin className="text-primary" size={40} />
+          Mapa Interactivo
+        </h1>
+        <p className="text-gray-600 mt-2 text-lg">
+          Descubre los mejores restaurantes con zona de ocio infantil a tu alrededor.
+        </p>
       </div>
-      
-      <h1 className="text-4xl md:text-5xl font-extrabold text-secondary mb-4">
-        Mapa en Construcción
-      </h1>
-      
-      <p className="text-gray-600 max-w-md mx-auto mb-8 text-lg">
-        ¡Vaya! Has llegado antes de tiempo. Estamos trabajando duro para integrar la geolocalización y los mapas interactivos en esta sección.
-      </p>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Link 
-          href="/" 
-          className="bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-orange-600 transition-colors shadow-md flex items-center justify-center gap-2"
-        >
-          <ArrowLeft size={20} />
-          Volver al Inicio
-        </Link>
-      </div>
+      {/* Renderizamos el componente del mapa pasándole los datos a través del Wrapper (Cliente) */}
+      <MapWrapper restaurantes={restaurantes} />
     </div>
   );
 }

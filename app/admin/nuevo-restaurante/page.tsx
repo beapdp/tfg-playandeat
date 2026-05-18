@@ -16,6 +16,8 @@ export default function NuevoRestaurantePage() {
     name: '',
     description: '',
     location: '',
+    lat: '',
+    lng: '',
     imageUrl: '',
     foodType: 'mediterranea',
     services: [] as string[]
@@ -178,18 +180,43 @@ export default function NuevoRestaurantePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                <MapPin size={16} /> Ubicación (Ciudad)
-              </label>
-              <input 
-                type="text" 
-                required
-                className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                placeholder="Ej: Madrid, Valencia..."
-                value={formData.location}
-                onChange={e => setFormData({...formData, location: e.target.value})}
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                  <MapPin size={16} /> Ubicación (Ciudad)
+                </label>
+                <input 
+                  type="text" 
+                  required
+                  className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                  placeholder="Ej: Madrid, Valencia..."
+                  value={formData.location}
+                  onChange={e => setFormData({...formData, location: e.target.value})}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-500">Latitud (Mapa)</label>
+                  <input 
+                    type="text" 
+                    className="w-full p-2 text-sm rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary outline-none"
+                    placeholder="Ej: 40.4168"
+                    value={formData.lat}
+                    onChange={e => setFormData({...formData, lat: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-500">Longitud (Mapa)</label>
+                  <input 
+                    type="text" 
+                    className="w-full p-2 text-sm rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary outline-none"
+                    placeholder="Ej: -3.7038"
+                    value={formData.lng}
+                    onChange={e => setFormData({...formData, lng: e.target.value})}
+                  />
+                </div>
+              </div>
             </div>
             
             <div className="space-y-2">

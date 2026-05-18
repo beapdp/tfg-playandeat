@@ -86,6 +86,19 @@ Es ligera, moderna, con iconos de alta calidad y perfectamente compatible con Re
 
 ---
 
+### 💡 Preguntas para la Defensa (Sección Iconos)
+
+**1. ¿Por qué habéis usado Lucide React y no otra librería como FontAwesome?**
+- **Respuesta:** *"Elegimos Lucide por su **minimalismo y modernidad**. A diferencia de otras librerías, Lucide genera iconos en formato **SVG real**, lo que nos permite personalizarlos fácilmente mediante clases de CSS o Tailwind (cambiar el color, el grosor del trazo o el tamaño). Además, es muy ligera y se integra de forma nativa con React como componentes individuales"*.
+
+**2. ¿Cómo ayudáis al rendimiento de la web al usar estos iconos?**
+- **Respuesta:** *"Gracias a una técnica llamada **Tree Shaking**. Al importar cada icono de forma individual (ej: `import { Heart } from 'lucide-react'`), Next.js solo incluye en el paquete final el código de los iconos que realmente estamos usando, eliminando los miles de iconos restantes de la librería. Esto hace que la web cargue mucho más rápido"*.
+
+**3. ¿Qué ventajas tiene que los iconos sean componentes de React?**
+- **Respuesta:** *"Nos permite tratarlos como cualquier otro elemento de la interfaz. Podemos pasarles 'props' para cambiar su comportamiento dinámicamente, como por ejemplo cambiar el color del icono del corazón de gris a rojo cuando el usuario marca un restaurante como favorito"*.
+
+---
+
 ### 1.3 `react` y `react-dom` — La base de la interfaz
 
 **¿Qué son?**
@@ -101,6 +114,45 @@ Aunque Next.js los incluye conceptualmente, se instalan como dependencias separa
 ```typescript
 import { useState, useEffect } from 'react';
 ```
+
+---
+
+### 1.4 `leaflet` y `react-leaflet` — El Mapa Interactivo
+
+**¿Qué son?**
+`leaflet` es la librería de mapas de código abierto más utilizada en el mundo (una alternativa profesional y gratuita a Google Maps). `react-leaflet` es el "puente" que nos permite usar Leaflet como si fueran componentes normales de React (`<MapContainer>`, `<Marker>`, etc.).
+
+**¿Para qué sirven en el proyecto?**
+Se encargan de renderizar el mapa interactivo en la sección `/mapa`. Permiten que el usuario vea dónde están situados los restaurantes, se desplace por el mapa y haga zoom.
+
+**¿Qué componentes clave usamos?**
+- `<MapContainer>`: Es el cuadro principal donde se dibuja el mapa.
+- `<TileLayer>`: Define de dónde vienen las imágenes del mapa (usamos **OpenStreetMap**, que es libre y gratuito).
+- `<Marker>`: Son los "pines" o marcadores naranjas que indican la posición exacta de cada restaurante.
+- `<Popup>`: La ventanita que aparece al hacer clic en un pin con la foto y el nombre del local.
+
+**¿En qué archivos aparecen?**
+- `components/RestaurantsMap.tsx` → Donde está programada toda la lógica visual del mapa.
+- `components/MapWrapper.tsx` → El envoltorio que usamos para que Next.js cargue el mapa correctamente.
+- `app/mapa/page.tsx` → La página principal que muestra el mapa al usuario.
+
+---
+
+### 💡 Preguntas para la Defensa (Sección Mapa)
+
+Si el tribunal os pregunta por esta parte, aquí tenéis las respuestas clave:
+
+**1. ¿Por qué habéis usado Leaflet y no Google Maps?**
+- **Respuesta:** *"Principalmente por tres motivos: **Gratuidad, Privacidad y Ética del Código Abierto**. Google Maps requiere vincular una tarjeta de crédito y tiene costes por cada visualización. Leaflet es una librería de código abierto que nos permite ofrecer la misma funcionalidad profesional sin dependencias comerciales. Además, para el alcance de este TFG, Leaflet es más ligero y se integra perfectamente con React"*.
+
+**2. ¿De dónde salen las imágenes de las calles?**
+- **Respuesta:** *"Usamos **OpenStreetMap**. Es como la 'Wikipedia de los mapas'. Es una base de datos cartográfica colaborativa y gratuita que Leaflet utiliza para pintar las baldosas (tiles) del mapa"*.
+
+**3. He visto que usáis un `MapWrapper` con carga dinámica, ¿por qué?**
+- **Respuesta:** *"Es una decisión técnica para optimizar el rendimiento. Los mapas interactivos necesitan acceder al objeto `window` del navegador. Como Next.js intenta renderizar las páginas en el servidor primero (donde no existe el navegador), usamos una carga dinámica con `ssr: false` para evitar errores de ejecución y asegurar que el mapa solo se cargue cuando el usuario ya tiene la web abierta"*.
+
+**4. ¿Qué pasa si un restaurante no tiene coordenadas en la base de datos?**
+- **Respuesta:** *"El sistema es robusto: antes de pintar el mapa, el código aplica un filtro que descarta automáticamente cualquier local que no tenga latitud o longitud. Así evitamos errores visuales o 'pines' que aparecen en medio del océano o en el punto (0,0)"*.
 
 ---
 
@@ -248,7 +300,8 @@ LIBRERÍAS EXTERNAS (package.json)
 ├── @supabase/supabase-js  →  Base de datos, Auth y Storage
 ├── lucide-react           →  Todos los iconos de la interfaz
 ├── react                  →  useState, useEffect
-└── react-dom              →  Renderizado en el navegador
+├── react-dom              →  Renderizado en el navegador
+└── leaflet/react-leaflet  →  Mapa interactivo y geolocalización
 
 HERRAMIENTAS DE NEXT.JS (incluidas en el framework)
 ├── next/image    →  <Image>       Fotos optimizadas

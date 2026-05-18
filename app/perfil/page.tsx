@@ -4,22 +4,19 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, Settings, User } from 'lucide-react';
+import { Heart, Settings, User, MessageSquare } from 'lucide-react';
 
 export default function PerfilPage() {
   const router = useRouter();
   const [perfil, setPerfil] = useState<any>(null);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // console.log("Cargando perfil...");
-    
     const cargarPerfil = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        // console.log("Sesión:", session?.user?.id);
-
         if (sessionError) {
           console.error("Error sesión:", sessionError);
           setError("Error al conectar con la sesión.");
@@ -28,14 +25,13 @@ export default function PerfilPage() {
         }
         
         if (!session) {
-          // No hay sesión
+          // No hay sesión, redirigimos a login
           router.push('/login');
           return;
         }
 
         const rol = session.user.user_metadata?.rol;
         const nombre = session.user.user_metadata?.nombre;
-        // console.log("Datos:", { nombre, rol });
 
         if (rol === 'negocio') {
           // Redirigir si es negocio
@@ -57,15 +53,12 @@ export default function PerfilPage() {
     // Timeout de seguridad: si en 5 segundos no ha cargado, soltamos el bloqueo
     const timer = setTimeout(() => {
       if (cargando) {
-        // console.warn("Timeout");
         setCargando(false);
       }
     }, 5000);
 
     return () => clearTimeout(timer);
   }, [router]);
-
-  const [error, setError] = useState('');
 
   if (cargando) return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
@@ -82,11 +75,12 @@ export default function PerfilPage() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 min-h-[70vh]">
+    <div className="max-w-6xl mx-auto py-12 px-4 min-h-[70vh]">
       <h1 className="text-3xl font-extrabold text-secondary mb-2">Panel de Familia</h1>
-      <p className="text-gray-500 mb-8">¡Hola, {perfil?.nombre || 'Familia'}! Gestiona tus sitios favoritos aquí.</p>
+      <p className="text-gray-500 mb-8">¡Hola, {perfil?.nombre || 'Familia'}! Gestiona tus sitios favoritos y tus valoraciones aquí.</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Grid responsivo de 4 columnas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Tarjeta de Favoritos */}
         <Link href="/favoritos" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group block">
@@ -95,6 +89,15 @@ export default function PerfilPage() {
           </div>
           <h3 className="font-bold text-lg text-secondary">Mis Favoritos</h3>
           <p className="text-sm text-gray-500 mt-2">Guarda tus restaurantes preferidos para tenerlos a mano.</p>
+        </Link>
+
+        {/* Tarjeta de Mis Valoraciones [NUEVO] */}
+        <Link href="/perfil/valoraciones" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer group block">
+          <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <MessageSquare size={32} className="text-amber-500" />
+          </div>
+          <h3 className="font-bold text-lg text-secondary">Mis Valoraciones</h3>
+          <p className="text-sm text-gray-500 mt-2">Revisa y edita las opiniones y puntuaciones que has dejado.</p>
         </Link>
 
         {/* Tarjeta de Perfil */}

@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { Star, MapPin, CheckCircle2 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import BackButton from '@/components/BackButton';
+import Link from 'next/link';
+import RestaurantReviews from '@/components/RestaurantReviews';
 
 export default async function RestauranteDetallePage({
   params,
@@ -55,9 +57,19 @@ export default async function RestauranteDetallePage({
             </div>
           </div>
 
-          <div className="flex items-center text-gray-500 mb-8">
-            <MapPin size={20} className="mr-2" />
-            <span className="text-lg">{restaurante.location}</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div className="flex items-center text-gray-500">
+              <MapPin size={20} className="mr-2" />
+              <span className="text-lg">{restaurante.location}</span>
+            </div>
+            
+            <Link 
+              href="/mapa" 
+              className="inline-flex items-center justify-center gap-2 bg-secondary text-white px-5 py-2.5 rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-sm text-sm"
+            >
+              <MapPin size={16} />
+              Ver en el mapa
+            </Link>
           </div>
 
           <div className="mb-8">
@@ -67,7 +79,7 @@ export default async function RestauranteDetallePage({
             </p>
           </div>
 
-          <div>
+          <div className="mb-8">
             <h2 className="text-xl font-bold text-secondary mb-4">Servicios para familias</h2>
             <div className="grid grid-cols-2 gap-4">
               {restaurante.services?.map((servicio: string) => (
@@ -78,6 +90,9 @@ export default async function RestauranteDetallePage({
               ))}
             </div>
           </div>
+
+          {/* COMPONENTE DE VALORACIONES (CLIENTE) */}
+          <RestaurantReviews restauranteId={id} />
 
         </div>
       </div>

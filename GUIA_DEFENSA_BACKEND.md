@@ -11,11 +11,11 @@ El profesor pidió expresamente: *"Usar Supabase como base de datos, pero implem
 
 **¿Dónde está en tu proyecto?**
 Toda la API REST está en la carpeta `app/api/`. Cada subcarpeta tiene un archivo `route.ts`.
-*   **Ejemplo para enseñar:** Abre `app/api/auth/registro/route.ts` o `app/api/favoritos/route.ts`.
+*   **Ejemplo para enseñar:** Abre `app/api/favoritos/route.ts` o `app/api/valoraciones/route.ts`.
 *   **¿Qué hace?** Recibe la petición HTTP (un `POST` o un `GET`), extrae los datos que manda el usuario (ej. su email y contraseña) y se los pasa al Controlador.
 
 **Si el profesor pregunta:** *"Enséñame un endpoint de vuestra API REST"*.
-**Tu respuesta:** "Por supuesto. Si vamos a `app/api/favoritos/route.ts`, podemos ver cómo recibimos la petición POST del cliente, comprobamos que el usuario tiene sesión, extraemos el `restaurantId` y llamamos a nuestro servicio para guardar el favorito."
+**Tu respuesta:** "Por supuesto. Si vamos a `app/api/favoritos/route.ts` o a `app/api/valoraciones/route.ts`, podemos ver cómo recibimos la petición POST del cliente, comprobamos que el usuario tiene sesión, extraemos los datos del cuerpo de la petición y llamamos a nuestro controlador correspondiente."
 
 ---
 
@@ -24,8 +24,8 @@ Toda la API REST está en la carpeta `app/api/`. Cada subcarpeta tiene un archiv
 
 **¿Dónde están?**
 En la carpeta `lib/backend/controllers/`.
-*   **Ejemplo para enseñar:** Abre `lib/backend/controllers/authController.ts`.
-*   **¿Qué hace?** Si te fijas en la función `handleRegistro`, primero comprueba que vengan todos los campos (`email`, `password`, `nombre`, `rol`). Si falta algo, devuelve un error 400 (Bad Request). Si todo está bien, llama al `AuthService`.
+*   **Ejemplo para enseñar:** Abre `lib/backend/controllers/authController.ts` o `lib/backend/controllers/restaurantController.ts` o `lib/backend/controllers/valoracionController.ts`.
+*   **¿Qué hace?** En `authController` comprueba el registro. En `restaurantController` valida que los nuevos locales incluyan latitud y longitud antes de guardarlos. En `valoracionController` comprueba que la puntuación de estrellas esté exactamente entre 1 y 5 y que no haya valoraciones duplicadas para un mismo usuario.
 
 **Si el profesor pregunta:** *"¿Para qué usáis los controladores?"*.
 **Tu respuesta:** "Los utilizamos para separar responsabilidades siguiendo el patrón de diseño *Controller-Service*. El controlador actúa como intermediario: valida los datos de entrada que llegan de la API y maneja los errores, dejando la lógica de negocio pura para la capa de Servicios."
@@ -37,11 +37,11 @@ En la carpeta `lib/backend/controllers/`.
 
 **¿Dónde están?**
 En la carpeta `lib/backend/services/`.
-*   **Ejemplo para enseñar:** Abre `lib/backend/services/favoriteService.ts` o `authService.ts`.
-*   **¿Qué hace?** Tienen funciones como `.insert()` o `.select()`. Ellos escriben y leen en las tablas reales de la base de datos.
+*   **Ejemplo para enseñar:** Abre `lib/backend/services/restaurantService.ts` o `lib/backend/services/valoracionService.ts`.
+*   **¿Qué hace?** Gestionan las operaciones CRUD y de negocio complejas. Por ejemplo, `restaurantService.ts` recupera restaurantes con coordenadas para el mapa. `valoracionService.ts` no solo guarda una reseña en la BBDD, sino que consulta todas las puntuaciones previas del local, calcula la media matemática y actualiza la tabla de restaurantes automáticamente.
 
 **Si el profesor pregunta:** *"Habéis dicho que Supabase es solo vuestra base de datos, ¿dónde está la lógica de negocio?"*.
-**Tu respuesta:** "Toda nuestra lógica de negocio reside en los Servicios. Por ejemplo, en el archivo `authService.ts` no solo creamos el usuario en el sistema de Auth, sino que tenemos lógica propia para insertar automáticamente a ese usuario en nuestra tabla personalizada de `perfiles` y asignarle un rol (Familia o Negocio). Esa orquestación la hemos programado nosotros, Supabase solo guarda los datos."
+**Tu respuesta:** "Toda nuestra lógica de negocio reside en los Servicios. Por ejemplo, en el archivo `authService.ts` no solo creamos el usuario en el sistema de Auth, sino que tenemos lógica propia para insertar automáticamente a ese usuario en nuestra tabla personalizada de `perfiles` y asignarle un rol (Familia o Negocio). Asimismo, en `valoracionService.ts` calculamos la media en tiempo real de las estrellas de un local al recibir una nueva opinión y la persistimos en la tabla `restaurantes`. Esa orquestación la hemos programado nosotros, Supabase solo guarda los datos."
 
 ---
 
@@ -60,6 +60,21 @@ La hemos aplicado en tres capas distintas:
 
 **Si el profesor pregunta:** *"¿Cómo habéis protegido la aplicación?"*.
 **Tu respuesta:** "Aplicamos seguridad en múltiples capas. En el lado del servidor de Next.js, nuestras rutas de API verifican la sesión y rechazan peticiones no autorizadas (error 401). Además, hemos implementado control de acceso por roles en el frontend para proteger los paneles de administración, y finalmente configuramos políticas RLS en la base de datos para garantizar que ningún usuario pueda alterar datos ajenos."
+
+---
+
+## 5. El Módulo de Valoraciones (Reseñas y Estrellas)
+**¿Qué es?** Es una funcionalidad comunitaria que permite a los usuarios con perfil de **Familia** escribir reseñas de texto y puntuar con estrellas (1 a 5) cada restaurante. Al guardarse una opinión, el backend recalcula de forma automática la nota media del local.
+
+---
+
+### Preguntas del Tribunal que os pueden hacer:
+
+#### ❓ *"¿Cómo se calcula la nota media (rating) del restaurante? ¿Lo hacéis a mano o lo hace la BBDD?"*
+**Tu respuesta:** "Lo gestiona nuestro backend de manera automática y consistente. Al guardar una nueva reseña en `ValoracionService.crearValoracion()`, primero insertamos la valoración de forma atómica. Seguidamente, realizamos una consulta para obtener todas las puntuaciones existentes de ese restaurante, calculamos el promedio aritmético exacto en JavaScript y, finalmente, realizamos un `UPDATE` en la tabla `restaurantes` para actualizar su columna `rating`. De este modo, la ficha del restaurante muestra la media en tiempo real."
+
+#### ❓ *"¿Cómo evitáis que un usuario sabotee a la competencia valorando 50 veces el mismo local con 1 estrella?"*
+**Tu respuesta:** "Lo controlamos en dos niveles. Primero, en el frontend ocultamos el formulario si el usuario no tiene rol 'familia'. Segundo, a nivel de base de datos, hemos añadido una restricción `UNIQUE (perfil_id, restaurante_id)` en la tabla `valoraciones`. Esto hace imposible que una misma persona inserte dos reseñas sobre el mismo restaurante. Si lo intenta, el motor PostgreSQL devuelve una excepción que nuestro `valoracionController.ts` captura y devuelve de forma controlada como un error 409 de conflicto."
 
 ---
 

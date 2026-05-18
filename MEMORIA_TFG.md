@@ -47,7 +47,11 @@ Desarrollar una plataforma integral (web y móvil-responsiva) que conecte a fami
 *   Implementar un sistema de autenticación seguro diferenciando entre perfiles de familia y de negocio.
 *   Crear una base de datos relacional y escalable para almacenar información detallada de los locales, incluyendo fotos y lista de servicios.
 *   Desarrollar un buscador inteligente con filtros por categoría (Brunch, Comida, Merienda, Cena) y por servicios específicos de entretenimiento.
+*   **Implementar un sistema de geolocalización interactivo** mediante mapas para facilitar la búsqueda visual de locales cercanos al usuario.
 *   Diseñar un panel de administración intuitivo para que los dueños de los restaurantes puedan gestionar su información de forma autónoma.
+*   **Implementar un sistema de edición de perfil** para que los usuarios puedan mantener actualizados sus datos personales.
+*   **Desarrollar un sistema de favoritos** que permita a las familias guardar y gestionar de forma persistente sus restaurantes predilectos.
+*   **Desarrollar un sistema de valoraciones (reseñas y estrellas)** para que las familias puedan puntuar y comentar su experiencia real en cada local, garantizando un feedback comunitario.
 *   Asegurar que la web sea totalmente responsiva, permitiendo que se use cómodamente desde el móvil en cualquier lugar (filosofía Mobile First).
 
 ---
@@ -57,6 +61,8 @@ Desarrollar una plataforma integral (web y móvil-responsiva) que conecte a fami
 ### 4.1) FUNDAMENTACIÓN TEÓRICA
 
 *   **Next.js (Framework Fullstack):** Framework basado en React que se ha utilizado para construir la aplicación completa. Gestiona tanto el renderizado de la interfaz como la lógica del servidor mediante **API Routes** propias. Una de sus características más relevantes es el soporte para **Server-Side Rendering (SSR)**, lo que permite que las páginas se generen en el servidor antes de enviarse al navegador, mejorando significativamente el rendimiento y la indexación en buscadores (SEO). *Justificación de su elección:* a diferencia de un proyecto React puro, Next.js permite centralizar frontend y backend en un único proyecto, reduciendo la complejidad y el tiempo de desarrollo.
+
+*   **Leaflet & React-Leaflet:** Librería de código abierto para mapas interactivos. Se utiliza junto a **OpenStreetMap** como proveedor de cartografía. *Justificación:* permite ofrecer una experiencia de geolocalización profesional y gratuita, evitando los costes de licencias de APIs propietarias y garantizando la privacidad de los datos.
 
 *   **TypeScript:** Superset de JavaScript que añade tipado estático al código. Sus características principales son la detección de errores en tiempo de compilación (antes de ejecutar el programa) y el autocompletado en el editor. *Justificación:* se ha elegido frente a JavaScript puro porque en un proyecto con múltiples modelos de datos (perfiles, restaurantes, favoritos) el tipado garantiza la coherencia de los datos en todo el flujo de la aplicación, reduciendo errores humanos críticos.
 
@@ -85,9 +91,9 @@ El desarrollo se ha estructurado en un cronograma de 12 semanas con una carga es
 | :--- | :--- | :--- | :--- |
 | **I. Análisis y Diseño** | Definición de requisitos, casos de uso y prototipado de la interfaz. | 1-2 | 40h |
 | **II. Infraestructura** | Configuración de Next.js, Supabase y estructura de carpetas del proyecto. | 3 | 20h |
-| **III. Backend** | Desarrollo de la API REST, controladores (`authController`, `restaurantController`), servicios (`authService`, `favoriteService`) y políticas de seguridad RLS. | 4-6 | 80h |
-| **IV. Frontend** | Construcción de componentes (`RestaurantCard`, `Header`, `HeroBanner`), páginas de usuario y panel de negocio, e integración con la API. | 7-9 | 90h |
-| **V. Pruebas y QA** | Pruebas funcionales de flujos de usuario (registro, login, subida de restaurantes, favoritos), corrección de errores y optimización de rendimiento. | 10-11 | 40h |
+| **III. Backend** | Desarrollo de la API REST, controladores (`authController`, `restaurantController`, `valoracionController`), servicios (`authService`, `favoriteService`, `valoracionService`) y políticas de seguridad RLS. | 4-6 | 80h |
+| **IV. Frontend** | Construcción de componentes (`RestaurantCard`, `Header`, `HeroBanner`, `RestaurantReviews`), páginas de usuario y panel de negocio, e integración con la API. | 7-9 | 90h |
+| **V. Pruebas y QA** | Pruebas funcionales de flujos de usuario (registro, login, subida de restaurantes, favoritos, opiniones), corrección de errores y optimización de rendimiento. | 10-11 | 40h |
 | **VI. Documentación** | Redacción de la memoria, guía técnica y vídeo demostrativo. | 12 | 30h |
 
 *   **Diagrama de la base de datos:**
@@ -97,6 +103,8 @@ erDiagram
     AUTH_USERS ||--o{ RESTAURANTES : "owner_id"
     PERFILES ||--o{ FAVORITOS : "perfil_id"
     RESTAURANTES ||--o{ FAVORITOS : "restaurante_id"
+    PERFILES ||--o{ VALORACIONES : "perfil_id"
+    RESTAURANTES ||--o{ VALORACIONES : "restaurante_id"
     
     PERFILES {
         uuid id PK
@@ -112,12 +120,22 @@ erDiagram
         string food_type
         string_array services
         float rating
+        float lat
+        float lng
         uuid owner_id FK
     }
     FAVORITOS {
         uuid id PK
         uuid perfil_id FK
         uuid restaurante_id FK
+        timestamp created_at
+    }
+    VALORACIONES {
+        uuid id PK
+        uuid perfil_id FK
+        uuid restaurante_id FK
+        integer puntuacion
+        text comentario
         timestamp created_at
     }
 ```
@@ -130,6 +148,7 @@ graph TD
     
     subgraph Familia
         FamiliaUser((Familia)) --> Buscar[Buscar Restaurantes]
+        FamiliaUser --> Mapa[Explorar en Mapa Interactivo]
         FamiliaUser --> Detalle[Ver ficha de restaurante]
         FamiliaUser --> Favoritos[Guardar favoritos]
     end
@@ -144,18 +163,18 @@ graph TD
 
     El proyecto sigue una estructura de carpetas organizada por responsabilidades, lo que facilita el mantenimiento y la escalabilidad:
 
-    *   **`/app`**: Contiene todas las rutas y páginas de la aplicación, gestionadas por el sistema de enrutamiento *App Router* de Next.js. Dentro de esta carpeta se distinguen dos tipos de contenido: las páginas visibles para el usuario (ej. `/restaurantes`, `/perfil`, `/admin`) y los puntos de entrada de la API REST (carpeta `/app/api/`), que actúan como el backend del sistema.
-    *   **`/components`**: Almacena piezas de interfaz reutilizables e independientes, como `RestaurantCard.tsx`, `Header.tsx` o `HeroBanner.tsx`. Este patrón evita la duplicidad de código y garantiza que cualquier cambio visual se aplique de forma consistente en toda la aplicación.
+    *   **`/app`**: Contiene todas las rutas y páginas de la aplicación, gestionadas por el sistema de enrutamiento *App Router* de Next.js. Dentro de esta carpeta se distinguen dos tipos de contenido: las páginas visibles para el usuario (ej. `/mapa`, `/restaurantes`, `/perfil`, `/admin`) y los puntos de entrada de la API REST (carpeta `/app/api/`), que actúan como el backend del sistema.
+    *   **`/components`**: Almacena piezas de interfaz reutilizables e independientes, como `RestaurantCard.tsx`, `Header.tsx`, `HeroBanner.tsx` o los componentes de cartografía `RestaurantsMap.tsx` y su envoltorio dinámico `MapWrapper.tsx`. Este patrón evita la duplicidad de código y garantiza que cualquier cambio visual se aplique de forma consistente en toda la aplicación.
     *   **`/lib`**: Contiene el núcleo lógico del backend, organizado en dos subcarpetas:
         *   `/lib/backend/controllers/`: Los **controladores** (ej. `authController.ts`, `restaurantController.ts`) reciben las peticiones de la API, validan los datos y delegan la operación al servicio correspondiente.
         *   `/lib/backend/services/`: Los **servicios** (ej. `authService.ts`, `favoriteService.ts`) son los únicos que interactúan directamente con la base de datos de Supabase, manteniendo la lógica de negocio separada del resto.
     *   **`/public`**: Almacena recursos estáticos como el logotipo e iconos de la aplicación.
 
-#### Breve análisis del código
-El núcleo del sistema reside en el patrón **Controller-Service**. El `authService.ts` gestiona la creación de perfiles y sesiones en Supabase, mientras que los componentes del frontend realizan consultas asíncronas para mostrar los datos en tiempo real, eliminando la necesidad de datos estáticos en el código.
+#### 4.2.1) Breve análisis del código
+La aplicación se basa en una arquitectura modular de tres capas (Componentes, Controladores y Servicios) que separa la interfaz de la lógica de negocio y el acceso a datos. Se ha implementado seguridad mediante roles y políticas **RLS** en Supabase, y se ha integrado un sistema de geolocalización dinámico mediante **Leaflet** con carga asíncrona para optimizar el rendimiento. Toda la información se gestiona en tiempo real mediante peticiones a una API REST propia desarrollada en Next.js.
 
 ### 4.3) RESULTADOS Y ANÁLISIS
-Se ha logrado implementar una aplicación funcional que cumple con todos los requisitos iniciales. Las familias pueden registrarse y acceder a un listado dinámico de restaurantes, mientras que los dueños de negocios pueden publicar sus locales con éxito. El rendimiento del sistema es excelente gracias al uso de Next.js.
+Se ha logrado implementar una aplicación funcional que cumple con todos los requisitos iniciales. Las familias pueden registrarse y acceder a un listado dinámico de restaurantes, mientras que los dueños de negocios pueden publicar sus locales con éxito. El rendimiento del sistema es excelente gracias al uso de Next.js y la optimización de consultas a la base de datos.
 
 ---
 
@@ -169,9 +188,8 @@ Como ampliaciones identificadas para el futuro del proyecto, se proponen las sig
 1.  **Sistema de Recomendaciones basado en IA:** Implementar algoritmos de aprendizaje automático para sugerir restaurantes de forma personalizada según la edad de los hijos y el historial de visitas de la familia.
 2.  **Comunidad y Quedadas (Playdates):** Crear un espacio social donde las familias puedan contactar entre sí para organizar comidas grupales y fomentar la socialización de los niños.
 3.  **Realidad Aumentada (Tour Virtual):** Integrar visualizaciones en 3D o realidad aumentada de las zonas de juego para que los padres puedan evaluar la seguridad de las instalaciones antes de realizar la reserva.
-4.  **Sistema de valoraciones:** Permitir que las familias publiquen comentarios y valoraciones sobre los servicios infantiles de cada restaurante.
-5.  **Integración de Mapas:** Mostrar los restaurantes en un mapa interactivo basado en la ubicación del usuario.
-6.  **Sistema de Reservas:** Permitir reservar mesa directamente desde la plataforma, indicando el número de niños y adultos.
+4.  **Sistema de valoraciones avanzadas:** Permitir que las familias publiquen comentarios y valoraciones específicas sobre la seguridad y limpieza de los servicios infantiles.
+5.  **Sistema de Reservas Integrado:** Permitir reservar mesa directamente desde la plataforma, indicando el número de niños y adultos para pre-configurar tronas o espacios.
 
 ---
 
@@ -179,6 +197,8 @@ Como ampliaciones identificadas para el futuro del proyecto, se proponen las sig
 
 *   Next.js. (2024). *Next.js Documentation*. Recuperado de [https://nextjs.org/docs](https://nextjs.org/docs)
 *   Supabase. (2024). *Supabase Documentation*. Recuperado de [https://supabase.com/docs](https://supabase.com/docs)
+*   Leaflet. (2024). *Leaflet - an open-source JavaScript library for interactive maps*. [https://leafletjs.com/](https://leafletjs.com/)
+*   React-Leaflet. (2024). *React components for Leaflet maps*. [https://react-leaflet.js.org/](https://react-leaflet.js.org/)
 *   Tailwind CSS. (2024). *Tailwind CSS Documentation*. Recuperado de [https://tailwindcss.com/docs](https://tailwindcss.com/docs)
 *   MDN Web Docs. (2024). *JavaScript Guide*. Recuperado de [https://developer.mozilla.org](https://developer.mozilla.org)
 *   Agile Alliance. (2024). *What is Agile?*. Recuperado de [https://www.agilealliance.org/agile101/](https://www.agilealliance.org/agile101/)

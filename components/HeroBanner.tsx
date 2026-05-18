@@ -53,13 +53,14 @@ export default function HeroBanner() {
           {/* 1. Input de Ubicación */}
           <div className="relative w-full">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Ubicación (Ej: Madrid)" 
+            <select 
               value={ubicacion}
               onChange={(e) => setUbicacion(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 md:py-4 rounded-xl text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm text-sm"
-            />
+              className="w-full pl-10 pr-4 py-3 md:py-4 rounded-xl text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary shadow-sm appearance-none cursor-pointer text-sm"
+            >
+              <option value="">Selecciona ciudad...</option>
+              <option value="madrid">Madrid</option>
+            </select>
           </div>
 
           {/* 2. Select de Tipo de Comida */}

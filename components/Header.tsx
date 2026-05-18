@@ -80,7 +80,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-light px-4 md:px-8 py-4 shadow-sm border-b border-gray-200">
+    <header className="sticky top-0 z-[9999] bg-light px-4 md:px-8 py-4 shadow-sm border-b border-gray-200">
       <div className="container mx-auto flex justify-between items-center max-w-6xl">
         
         {/* === LOGO Y NOMBRE DE LA MARCA === */}

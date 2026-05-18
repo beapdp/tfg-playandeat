@@ -35,23 +35,36 @@ export default function MapPromo() {
 
         {/* === IMAGEN DEL MAPA A LA DERECHA === */}
         <div className="flex-1 w-full relative z-10 flex justify-center md:justify-end">
-          {/* Usamos un contenedor con borde redondeado e imagen de prueba para el mapa */}
-          <div className="relative w-full max-w-md h-64 md:h-80 bg-orange-200 rounded-2xl shadow-lg border-4 border-white/20 overflow-hidden transform rotate-2 hover:rotate-0 transition-transform duration-500 cursor-pointer">
+          {/* 
+            MEJORA DE UX (Experiencia de Usuario):
+            Hemos envuelto la previsualización en un <Link> para que toda la imagen sea 
+            un punto de acceso al mapa real. Esto se llama "Clickable Area Expansion" y 
+            mejora la navegabilidad. 
+            
+            Además, hemos eliminado la etiqueta estática de "Previsualización" por un 
+            indicador dinámico que solo aparece al pasar el ratón (hover), invitando a la acción.
+          */}
+          <Link href="/mapa" className="relative w-full max-w-md h-64 md:h-80 bg-orange-200 rounded-2xl shadow-lg border-4 border-white/20 overflow-hidden transform rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 cursor-pointer group block">
             <Image 
               // Usamos una imagen genérica de mapa de Unsplash
               src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=80" 
               alt="Vista del Mapa Interactivo"
               fill
-              className="object-cover opacity-80"
+              className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            {/* Superponemos un gradiente y un texto en medio para que parezca una previsualización real */}
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex items-end justify-center pb-6">
-               <span className="bg-white text-primary px-4 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wider">
-                  Previsualización
+            {/* 
+              OVERLAY INTERACTIVO:
+              Este bloque aparece suavemente cuando el usuario pasa el ratón por encima 
+              del mapa, indicando visualmente que es un elemento con el que se puede interactuar.
+            */}
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+               <span className="bg-white text-primary px-6 py-3 rounded-full text-sm font-extrabold shadow-xl uppercase tracking-wider flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                  <Map size={18} />
+                  Abrir Mapa
                </span>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Círculos decorativos de fondo (para que la caja no sea totalmente plana) */}

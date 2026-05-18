@@ -13,6 +13,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Faltan las variables de entorno de Supabase. Revisa el archivo .env.local');
 }
 
-// Creamos y exportamos el cliente. 
-// A partir de ahora, cuando queramos leer restaurantes haremos: supabase.from('restaurantes').select('*')
+// Creamos y exportamos el cliente por defecto (anónimo)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Función para obtener un cliente de Supabase con el contexto de sesión de un usuario (para RLS)
+export function getSupabaseClient(token?: string) {
+  if (!token) return supabase;
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  });
+}
